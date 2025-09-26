@@ -1,0 +1,67 @@
+# Clippy configuration
+# https://rust-lang.github.io/rust-clippy/master/index.html
+
+# Minimum supported Rust version
+msrv = "1.70.0"
+
+# Avoid breaking exported API when applying clippy fixes
+avoid-breaking-exported-api = true
+
+# Maximum cognitive complexity for functions
+cognitive-complexity-threshold = 30
+
+# Maximum number of lines for functions
+too-many-lines-threshold = 100
+
+# Maximum number of arguments for functions
+too-many-arguments-threshold = 7
+
+# Maximum size for types passed by value
+trivial-copy-size-limit = 16
+
+# Maximum size for enum variants
+enum-variant-size-threshold = 200
+
+# Warn on TODO and FIXME comments
+warn-on-all-wildcard-imports = true
+
+# Set the maximum allowed size for arrays on the stack
+array-size-threshold = 512
+
+# Maximum nesting level for blocks
+excessive-nesting-threshold = 5
+
+# Documentation requirements
+missing-docs-in-crate-items = true
+
+# Enforce module-level documentation
+check-private-items = false
+
+# Allow common patterns
+allow-expect-in-tests = true
+allow-unwrap-in-tests = true
+allow-dbg-in-tests = true
+allow-print-in-tests = true
+
+# Style preferences
+single-char-binding-names-threshold = 3
+type-complexity-threshold = 250
+vec-box-size-threshold = 4096
+
+# Disallow certain macros
+disallowed-macros = []
+
+# Disallow certain types
+disallowed-types = []
+
+# Disallow certain methods
+disallowed-methods = []
+
+# Standard prefixes for conversion methods
+standard-macro-braces = [
+    { name = "format", brace = "(" },
+    { name = "format_args", brace = "(" },
+    { name = "print", brace = "(" },
+    { name = "println", brace = "(" },
+    { name = "vec", brace = "[" },
+]
