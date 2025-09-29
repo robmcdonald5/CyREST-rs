@@ -15,7 +15,7 @@ async fn main() {
 
     match client.get(url).send().await {
         Ok(response) => {
-            println!("✓ Connection successful!");
+            println!("  Connection successful!");
             println!("  Status: {}", response.status());
             println!("  Headers: {:#?}\n", response.headers());
 
@@ -31,21 +31,21 @@ async fn main() {
                     println!("\nAttempting JSON parse...");
                     match serde_json::from_str::<serde_json::Value>(&text) {
                         Ok(json) => {
-                            println!("✓ Valid JSON!");
+                            println!("  Valid JSON!");
                             println!("{}", serde_json::to_string_pretty(&json).unwrap());
                         }
                         Err(e) => {
-                            println!("✗ JSON parse failed: {}", e);
+                            println!("  JSON parse failed: {}", e);
                         }
                     }
                 }
                 Err(e) => {
-                    println!("✗ Failed to read response body: {}", e);
+                    println!("  Failed to read response body: {}", e);
                 }
             }
         }
         Err(e) => {
-            println!("✗ Connection failed: {}", e);
+            println!("  Connection failed: {}", e);
 
             if e.is_connect() {
                 println!("\nLikely causes:");
