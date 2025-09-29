@@ -17,11 +17,46 @@ pub type Result<T> = std::result::Result<T, Error>;
 /// interacting with the CyREST API.
 #[derive(Debug, Error)]
 pub enum Error {
-    /// Error taxonomy for HTTP-related errors
+    /// HTTP request failed
+    #[error("HTTP request failed: {0}")]
+    Http(#[from] reqwest::Error),
+
+    /// Failed to parse URL
+    #[error("Invalid URL: {0}")]
+    Url(#[from] url::ParseError),
+
+    /// JSON serialization/deserialization error
+    #[error("JSON error: {0}")]
+    Json(#[from] serde_json::Error),
+
+    /// Connection to Cytoscape failed
+    #[error("Failed to connect to Cytoscape at {url}: {message}")]
+    ConnectionFailed {
+        /// The URL that failed to connect
+        url: String,
+        /// Detailed error message explaining the connection failure
+        message: String,
+    },
+
+    /// API returned an error response
+    #[error("API error (status {status}): {message}")]
+    ApiError {
+        /// HTTP status code returned by the API
+        status: u16,
+        /// Error message from the API response
+        message: String,
+    },
+
+    /// Timeout occurred
+    #[error("Request timed out after {seconds} seconds")]
+    Timeout {
+        /// Number of seconds before the timeout occurred
+        seconds: u64,
+    },
 }
 
 impl Error {
-    /// Error helper functions
+    // Helper functions will be added here as needed
 }
 
 /// Error details for debugging purposes.
