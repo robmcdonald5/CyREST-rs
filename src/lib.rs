@@ -62,12 +62,7 @@ pub mod client;
 pub mod error;
 
 // Re-export main types for convenience
-#[cfg(feature = "async")]
-pub use client::CyRestClient;
-
-#[cfg(feature = "blocking")]
-pub use client::CyRestClientBlocking;
-
+pub use client::{SimpleClient, CytoscapeInfo};
 pub use error::{Error, Result};
 
 // Module declarations that will be implemented
