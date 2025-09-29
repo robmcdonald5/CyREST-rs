@@ -57,17 +57,7 @@ async = ["tokio", "reqwest/default"]
 blocking = ["reqwest/blocking"]
 
 [[example]]
-name = "basic_usage"
-
-[[example]]
-name = "create_network"
-
-[[example]]
-name = "query_api"
-
-[[bench]]
-name = "client_bench"
-harness = false
+name = "basic_connection"
 
 [profile.release]
 lto = true
