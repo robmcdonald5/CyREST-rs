@@ -4,27 +4,81 @@
 //! for communicating with the Cytoscape REST API. The clients handle
 //! HTTP communication, request/response serialization, and error handling.
 
-use crate::error::{Error, Result};
-use reqwest::header::{HeaderMap, HeaderValue, CONTENT_TYPE};
+use reqwest;
 use serde::{Deserialize, Serialize};
-use std::time::Duration;
-use url::Url;
 
-const DEFAULT_TIMEOUT_SECS: u64 = 30;
-const DEFAULT_PORT: u16 = 1234;
-
-/// Configuration for the CyREST client.
-#[derive(Debug, Clone)]
-pub struct ClientConfig {
-    /// Base URL for the CyREST API.
-    pub base_url: Url,
-    /// Request timeout duration.
-    pub timeout: Duration,
-    /// Custom headers to include in requests.
-    pub headers: HeaderMap,
+/// Simple client for connecting to Cytoscape
+pub struct SimpleClient {
+    base_url: String,
+    client: reqwest::Client,
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+/// Response from Cytoscape's /v1 endpoint with system info
+#[derive(Debug, Deserialize, Serialize)]
+pub struct CytoscapeInfo {
+    /// The version of the CyREST API
+    #[serde(rename = "apiVersion")]
+    pub api_version: String,
+    /// Whether all Cytoscape apps have finished starting
+    #[serde(rename = "allAppsStarted")]
+    pub all_apps_started: bool,
+    /// Number of CPU cores available to Cytoscape
+    #[serde(rename = "numberOfCores")]
+    pub number_of_cores: u32,
+}
+
+impl SimpleClient {
+    /// Create a new client connecting to localhost:1234 (default Cytoscape port)
+    pub fn new() -> Self {
+        Self {
+            base_url: "http://localhost:1234".to_string(),
+            client: reqwest::Client::new(),
+        }
+    }
+
+    /// Create a client with a custom URL
+    pub fn with_url(url: &str) -> Self {
+        Self {
+            base_url: url.to_string(),
+            client: reqwest::Client::new(),
+        }
+    }
+
+    /// Check if we can connect to Cytoscape
+    pub async fn ping(&self) -> Result<CytoscapeInfo, String> {
+        // Try to connect to the /v1 endpoint for system info (format! is required to build proper URL schema)
+        let url = format!("{}/v1", self.base_url);
+        let response = self.client
+            .get(&url)
+            .send()
+            .await
+            .map_err(|e| format!("Failed to connect: {}", e))?;
+
+        // Check if we got a good response
+        if !response.status().is_success() {
+            return Err(format!("Bad response: {}", response.status()));
+        }
+
+        // Parse the JSON response
+        response
+            .json::<CytoscapeInfo>()
+            .await
+            .map_err(|e| format!("Failed to parse response: {}", e))
+    }
+
+    /// Get list of networks (returns raw JSON string for simplicity)
+    pub async fn get_networks(&self) -> Result<String, String> {
+        let url = format!("{}/v1/networks", self.base_url);
+
+        let response = self.client
+            .get(&url)
+            .send()
+            .await
+            .map_err(|e| format!("Failed to get networks: {}", e))?;
+
+        response
+            .text()
+            .await
+            .map_err(|e| format!("Failed to read response: {}", e))
+    }
 }
